@@ -11,6 +11,8 @@ import argparse
 import random
 import math
 import numpy
+import sys
+import os
 # LED strip configuration:
 LED_COUNT      = 150      # Number of LED pixels.
 LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
@@ -25,50 +27,56 @@ LRed = 0
 LBlue = 0
 LGreen = 0
 
+def colorSolid(strip,color):
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, color)
+    strip.show()
+        
 
 def ColorWipeFunc(var):
     return 150 - var
 # Define functions which animate LEDs in various ways.
 
-def colorWipe(strip, color, delay):
+def colorPulse(strip, colorOne, delay, colorTwo):
+
+
+
     randvarOne = random.randint(20,25)
     randvarTwo = random.randint(32,63)
     randvarThree = random.randint(70,100)
     randvarFour = random.randint( 107 , 115)
-    colorone = Color(100,10,50)
-    colorTwo = Color(50,150,10)
     colorthree = Color(40,100,0)
+ 
     
-
     halfWidth = 7
     
-    for x in range(0,149):
+    for x in range(65,90):
     
-        upperB = (76 + 74*numpy.sin(x*math.pi/24))
-        lowerB = (74 + 74*numpy.sin(x*math.pi/24))
         
         print("Frame: ", x)
-        print("upperB", upperB, "lowerB", lowerB)
+        
         print(" ")
        #print(100 + 50*sine, 50 + 50*sine) 
         for i in range(strip.numPixels()):
            # if((x-25) <= 115 and x > 0):
-            if(i  <= upperB and i > lowerB):
+            if(i  <= (randvarOne + 5) - abs(x-80) and i >= (randvarOne-5) + abs(x - 80)):
                 strip.setPixelColor(i, colorTwo)
-                #print("True")
-    
+                print("1")
+            elif(i  <= (randvarTwo+5) - abs(x-70) and i >= (randvarTwo-5)+ abs(x - 70)):
+                strip.setPixelColor(i, colorTwo)
+                print("2")
+            elif(i  <= (randvarThree+5) - abs(x-75) and i >= (randvarThree-5) + abs(x - 75)):
+                strip.setPixelColor(i, colorTwo)
+                print("3")
+            elif(i  <= (randvarFour+5) - abs(x-85) and i >= (randvarFour-5) + abs(x - 85)):
+                strip.setPixelColor(i, colorTwo)
+                print("4")
             else:
-                strip.setPixelColor(i, colorone)
+                strip.setPixelColor(i, colorOne)
             
         time.sleep(delay)
         strip.show()
-        for i in range(strip.numPixels()):
-           # if((x-25) <= 115 and x > 0):    
-            if(i  <= (76 + 74*numpy.sin(x*math.pi/24)) and i > (74 + 74*numpy.sin(x*math.pi/24))):
-                strip.setPixelColor(i, colorthree)
 
-        time.sleep(delay)
-        strip.show()
 def fun(x):
     return float((25/8)*numpy.cos((x+37)*math.pi/24))
 
@@ -130,16 +138,31 @@ if __name__ == '__main__':
     strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
     # Intialize the library (must be called once before other functions).
     strip.begin()
- #   LRed = input("Red: ")
-#    LBlue = input("Blue: ")
- #   LGreen = input("Green: ")    
- 
-    try:
-        while True:   
+    print("Color Background")
+    LRed = input("Red: ")
+    LBlue = input("Blue: ")
+    LGreen = input("Green: ") 
+    print(" ")
+    print("Color Main")
+    LERed = input("Red: ")
+    LEBlue = input("Blue: ")
+    LEGreen = input("Green: ")     
 
-            colorTest(strip, Color(0, 0, 0),2)  # Green wipe
+    
+    try:
+       # Loption = input("display(pulse,solid):")
+        while True: 
+            #if (Loption == "pulse"):
+            colorPulse(strip, Color(LGreen, LRed, LBlue),.2,Color(LEGreen, LERed, LEBlue))  # Green wipe
       #      colorWipe(strip, Color(0,0,0),1)
-            
+          #  if (Loption == "solid"):
+           #     colorSolid(strip,Color(LGreen,LRed,LBlue))
+
     except KeyboardInterrupt:
-        if args.clear:
-            colorTest(strip, Color(0,0,0), 5)
+        print("exit")
+        try:
+            sys.exit(0)
+        except SystemExit:
+            colorSolid(strip, Color(0,0,0))
+            os._exit(0)
+        
