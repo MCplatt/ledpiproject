@@ -16,7 +16,7 @@ import LED_low_level
 #https://agromonitoring.com/api/current-weather
 def APIgetWeather(param1,param2,location):
     URL = "https://api.openweathermap.org/data/2.5/weather"
-    apikey = "5e62e6d5676f5954155893401110d3f2"
+    apikey = #NO API KEYS ON GITHUB
     payload = {'q':location,'appid':apikey}
     time.sleep(15) #only allow 1 request per second
 
