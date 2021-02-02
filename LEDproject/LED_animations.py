@@ -13,8 +13,8 @@ from LED_low_level import *
 import os
 
  
-def pictureToAnim(strip,picture,frames,delay,mod = 0): #USE OPTIONAL PARAMTERS TO MAKE TIMED ANIMATION OPTIONAL
-#Mod = modified, breakafter single frame
+def pictureToAnim(strip,dispStart,dispEnd,picture,frames,delay,mod = 0): #USE OPTIONAL PARAMTERS TO MAKE TIMED ANIMATION OPTIONAL
+#Mod = return Picture in list form, each elemnt is (g,r,b) form
     pictureMod = picture[:(picture.find('.'))] + "MOD" + picture[picture.find('.'):]
     
     print(os.listdir("./LED_assets/"))
@@ -22,12 +22,13 @@ def pictureToAnim(strip,picture,frames,delay,mod = 0): #USE OPTIONAL PARAMTERS T
     if((pictureMod) in os.listdir("./LED_assets/")):
         im = Image.open("./LED_assets/" + pictureMod)
     else:
-        im = picturetoTemplate(81,148,strip,picture) #81 to 148 is the current frame size this adjusts with different frame size and length
+        im = picturetoTemplate(dispStart,dispEnd,strip,picture) #81 to 148 is the current frame size this adjusts with different frame size and length
         im.save("./LED_assets/" + pictureMod)
 
 
     pixels = list(im.getdata())
-    #print(pixels)
+    if(mod == 1)
+        return pixels
 
     stripNextPic = [0] * 150
     
@@ -43,8 +44,7 @@ def pictureToAnim(strip,picture,frames,delay,mod = 0): #USE OPTIONAL PARAMTERS T
                     stripNextPic[i] = Color(pixels[x][1],pixels[x][0],pixels[x][2])
                 
                 colorChange(strip,stripNextPic, frames,delay)
-            if mod == 1:
-                break
+            
     except KeyboardInterrupt:
         print("exit pic")
         animExit(1,strip)  

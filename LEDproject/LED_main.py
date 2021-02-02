@@ -96,7 +96,8 @@ def modeCam(strip,frames, colorOne, delay,colorTwo):
           
             
         
-def modeWeather(strip):
+def modeWeather(strip,dispStart,dispEnd,mod=0):
+#mod = Modification, return the picture in list form each element is a color(g,r,b)
     stripNextWeather = [0] * 150
     primary = "weather" #raw_input("param1: ")
     secondary = "icon" #raw_input("param2: ")
@@ -110,15 +111,15 @@ def modeWeather(strip):
             strip.setPixelColor(j,Color(0,0,0))
     
     weathColor ={
-                    "01":animSolid(strip,Color(235,235,255),10,82,148),# Clear Sky-------------------------
-                    "02":pictureToAnim(strip,"/fewclouds.png",10,.001,1),#Few Clouds-------------------------
-                    "03":pictureToAnim(strip,"/fewclouds.png",30,.001,1),#scattered clouds-------------------
-                    "04":pictureToAnim(strip,"/clouds.png",24,.001,1), # broken Clouds--------------------
-                    "09":pictureToAnim(strip,"/rain.png",15,.001,1),#shower rain---------------------------
-                    "10":pictureToAnim(strip,"/rain.png",30,.001,1),#rain-----------------------------------
-                    "11":pictureToAnim(strip,"/lightningrain.png",24,.001,1),#thunder storm------------------------
-                    "13":pictureToAnim(strip,"/snow.png",24,.001,1),#snow ------------------------------
-                    "50":pictureToAnim(strip,"/clouds.png",30,.001,1)#mist--------------------------------
+                    "01":animSolid(strip,Color(235,235,255),10,dispStart,dispEnd),# Clear Sky-------------------------
+                    "02":pictureToAnim(strip,dispStart,dispEnd,"/fewclouds.png",10,.001,1),#Few Clouds-------------------------
+                    "03":pictureToAnim(strip,dispStart,dispEnd,"/fewclouds.png",30,.001,1),#scattered clouds-------------------
+                    "04":pictureToAnim(strip,dispStart,dispEnd,"/clouds.png",24,.001,1), # broken Clouds--------------------
+                    "09":pictureToAnim(strip,dispStart,dispEnd,"/rain.png",15,.001,1),#shower rain---------------------------
+                    "10":pictureToAnim(strip,dispStart,dispEnd,"/rain.png",30,.001,1),#rain-----------------------------------
+                    "11":pictureToAnim(strip,dispStart,dispEnd,"/lightningrain.png",24,.001,1),#thunder storm------------------------
+                    "13":pictureToAnim(strip,dispStart,dispEnd,"/snow.png",24,.001,1),#snow ------------------------------
+                    "50":pictureToAnim(strip,dispStart,dispEnd,"/clouds.png",30,.001,1)#mist--------------------------------
                 }    
     try:
         while True:
@@ -144,7 +145,7 @@ def modeTime(strip, dispStart, dispEnd, mod = 0):
     delay = 1
     colorDay = Color(200,200,255)#GRB
     colorNight = Color(100,100,1)
-    stripNextTime = [0] * 150
+    stripNextTime = [0] * 300
 
     try:
         while True:
@@ -152,22 +153,26 @@ def modeTime(strip, dispStart, dispEnd, mod = 0):
             timeCurr = (now.hour *3600) + (now.minute * 60) + now.second  #Decimal time in seconds
             timeDay = APIgetTime("solar_noon") 
             timeNight = (timeDay + 43200) % 86400
+
             print(timeDay,timeNight)
             print(timeCurr)
+
             if((timeCurr >= timeNight) and (timeCurr < timeDay)):
                 print("Night -> Day-----------------------------------")    
                 for i in range(strip.numPixels()):
                     if(i > dispStart and i < dispEnd): 
                         strip.setPixelColor(i, colorNight)                    #Initialise strip because NULL = 0
                         stripNextTime[i] = colorDay        #INIT Copy strip to temp array
-                    else:
+                    else: 
                         strip.setPixelColor(i, Color(0,0,0))                #Initialise strip because NULL = 0
                         stripNextTime[i] = Color(0,0,0)       #MUST INIT STRIP MID LOOP BECAUSE ENTRENCE POINT IS VARIABLE
 
                 timeCurrAdj = timeCurr - timeNight  # Find how many frames into the cycle the time is and start the color change timeCurrAdj man frames in
-                
-                colorChange(strip,stripNextTime, abs(timeDay - timeNight) ,delay,timeCurrAdj)
+                OutputVec = colorChange(strip,stripNextTime, abs(timeDay - timeNight) ,delay,timeCurrAdj,mod)
 
+                if (mod == 1): 
+                    return OutputVec
+                    
             elif((timeCurr < timeNight) or (timeCurr >= timeDay)):
                 print("Day -> Night-----------------------------------")
                 for i in range(strip.numPixels()):           #make next frame 
@@ -183,19 +188,34 @@ def modeTime(strip, dispStart, dispEnd, mod = 0):
                 elif(timeCurr <= timeNight):
                     timeCurrAdj = timeCurr + (86400 - timeDay)
  
-                colorChange(strip,stripNextTime, (timeNight + (86400 - timeDay)) ,delay, timeCurrAdj)
+                OutputVec = colorChange(strip,stripNextTime, (timeNight + (86400 - timeDay)) ,delay, timeCurrAdj,mod)
+                if (mod == 1): 
+                    return OutputVec
 
     except KeyboardInterrupt:
         print("exit Time")
         animExit(0,strip)  
         
 def modeMulti(strip):
-    stripMulti = []
-    for j in range(strip.numPixels()):
-        stripMulti.append(strip.getPixelColor(j))
-    modeCam(strip,frames, Color(LGreen, LRed, LBlue),Ldelay,Color(LEGreen, LERed, LEBlue)) #GLOBAL COLORS
-    modeTime(strip, 81,148)
-    modeWeather(strip)
+
+    try:
+        while True:
+            stripMulti = []
+            for j in range(strip.numPixels()):
+                stripMulti.append(strip.getPixelColor(j))
+            timeArray = modeTime(strip, 81,148,1)
+            
+            for i in range(strip.numPixels()):
+                if (i > 81) and (i<148):
+                    if timeArray[i] > 0:
+                        stripMulti[i] = timeArray[i]
+            # modeWeather(strip,)
+            # modeCam(strip,frames, Color(LGreen, LRed, LBlue),Ldelay,Color(LEGreen, LERed, LEBlue)) #GLOBAL COLORS   
+            colorChange(strip,stripMulti,1,.0001)
+    except KeyboardInterrupt:
+        print("exit Multi")
+        animExit(0,strip)  
+
 
 if __name__ == '__main__':
 
@@ -223,6 +243,10 @@ if __name__ == '__main__':
         LEGreen = 75
         LERed = 255
         LEBlue = 20
+    # MULTIFRAME VARIABLES make setable at some point, constant for now
+    timeBounds = (50,100)
+    weatherBounds = (100,150)
+    camBounds = (150,200)
 
     print("Main Color code:", hex(Color(LGreen, LRed, LBlue)))
     print("Secondary Color code:", hex(Color(LEGreen, LERed, LEBlue)))    
@@ -252,7 +276,7 @@ if __name__ == '__main__':
                 animSolid(strip,Color(LGreen,LRed,LBlue),DispStart,DispEnd)
                 
             elif (Lmode == "6"):#MODE WEATHER
-                modeWeather(strip)
+                modeWeather(strip,81,148)
                 
             elif(Lmode == "1"):#ANIM FLASH
                 Ldelay = input("Delay between Frames (Sec) (.0001 fast - 2 slow):")
@@ -285,11 +309,11 @@ if __name__ == '__main__':
                 # frames = 8sa
 
                 pictureToAnim(strip,picList[int(animIndex)],frames,Ldelay)
-            elif(Lmode == "8")
+            elif(Lmode == "8"):
                 modeMulti(strip)
                 
                 
-                colorChange(strip,stripNextTime, (timeNight + (86400 - timeDay)) ,delay, timeCurrAdj)
+
                 
                 
     except KeyboardInterrupt:

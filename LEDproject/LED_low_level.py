@@ -67,8 +67,9 @@ def colorChangeFun(LEDColorOne,LEDColorTwo,Frame,CurrFrame):
         #print(int(  LightMedian + ((LightDif/2)  * (float(HalfFrame - CurrFrame)/HalfFrame))  ))
         return abs(int(  LightMedian + ((LightDif/2)  * (float(HalfFrame - CurrFrame)/HalfFrame))  ))
 
-def colorChange(strip, stripNext, Frames, delay, newStart = 0, mod = 0):
-#newStart = new Starting point, starts the loop further in the colorchange loop, default = 0   
+def colorChange(strip, stripNext, Frames, delay, Start = 0, mod = 0):
+# Start = new Starting point, starts the loop further in the colorchange loop, default = 0 
+# mod = return a vector of what the output instead of changing color  
     stripTemp = []
     for j in range(strip.numPixels()):
         stripTemp.append(strip.getPixelColor(j))
@@ -78,7 +79,7 @@ def colorChange(strip, stripNext, Frames, delay, newStart = 0, mod = 0):
     # print(Frames)
     #DEBUG BLOCK===============
     
-    for i in range(newStart,Frames):
+    for i in range(Start,Frames):
         for n in range(strip.numPixels()):
             colorOneRBG = hex_to_rgb(hex(stripTemp[n]))
             colorTwoRBG = hex_to_rgb(hex(stripNext[n]))
@@ -86,10 +87,11 @@ def colorChange(strip, stripNext, Frames, delay, newStart = 0, mod = 0):
             Tgreen = colorChangeFun(colorOneRBG[0],colorTwoRBG[0], Frames, i)
             Tred = colorChangeFun(colorOneRBG[1],colorTwoRBG[1], Frames, i)
             Tblue = colorChangeFun(colorOneRBG[2],colorTwoRBG[2], Frames, i)
-            
-            strip.setPixelColor(n,Color(Tgreen,Tred,Tblue))
-            
-            
+        
+            if (mod == 1):
+                stripTemp[n] = Color(Tgreen,Tred,Tblue)
+            else:
+                strip.setPixelColor(n,Color(Tgreen,Tred,Tblue))
         #DEBUG BLOCK===============
         # print("")
         # print("FRAME",i)
@@ -99,7 +101,8 @@ def colorChange(strip, stripNext, Frames, delay, newStart = 0, mod = 0):
         # print(colorTwoRBG)
         # print("")     
         #DEBUG BLOCK===============
-        
-        strip.show()
-        time.sleep(delay)
-
+        if (mod == 1):
+            return stripTemp
+        else:
+            strip.show()
+            time.sleep(delay)
