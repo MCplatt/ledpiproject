@@ -24,20 +24,19 @@ def picturetoTemplate(DispStart,DispEnd, strip,Pic): #TODO add multiple displays
     
     
     # print(DispEnd,DispTotal,PicMid)
-    # print("stdHeight",stdHeight)
+    print("stdHeight",stdHeight)
     print("im: ",im.height,im.width)
-    # print("BGim: ",BGim.height,BGim.width)
+    print("BGim: ",BGim.height,BGim.width)
     
     for j in range(stdHeight-1,-1,-1): #loop through image from bottom to top, 
         print("---------Frame: " + str(j))
         for i in range(DispTotal):
             if (i <= PicMid): #move image pixel and put pixel in the background image
                 #DEBUG BLOCK===============
-                # print(DispStart + (i + (DispTotal - PicMid)),j,im.getpixel((i,j)))
-                # print("UNDER MID")
+                print(DispStart + (i + (DispTotal - PicMid)),j,im.getpixel((i,j)))
+                print("UNDER MID")
                 #DEBUG BLOCK===============
                 BGim.putpixel( ((DispStart + (i + (DispTotal - PicMid))), j), im.getpixel((i,j)) ) 
-               
                
             else:    
                 BGim.putpixel( ((DispStart + (i - PicMid)), j), im.getpixel((i,j)) ) 

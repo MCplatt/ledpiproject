@@ -203,6 +203,7 @@ def modeMulti(strip):
             stripMulti = []
             for j in range(strip.numPixels()):
                 stripMulti.append(strip.getPixelColor(j))
+
             timeArray = modeTime(strip, 81,148,1)
             
             for i in range(strip.numPixels()):
@@ -307,8 +308,10 @@ if __name__ == '__main__':
                 frames = input("Frames: ")
                 # Ldelay = .0001
                 # frames = 8sa
-
-                pictureToAnim(strip,picList[int(animIndex)],frames,Ldelay)
+                startIn = input("Start index: ")
+                endIn = input("End Index: ")
+                #pictureToAnim(strip,startIn,endIn,picList[int(animIndex)],frames,Ldelay)
+                pictureToAnim(strip,25,175,picList[7],24,.0001)
             elif(Lmode == "8"):
                 modeMulti(strip)
                 
