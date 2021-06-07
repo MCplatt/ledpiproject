@@ -311,7 +311,7 @@ if __name__ == '__main__':
                 startIn = input("Start index: ")
                 endIn = input("End Index: ")
                 #pictureToAnim(strip,startIn,endIn,picList[int(animIndex)],frames,Ldelay)
-                pictureToAnim(strip,25,175,picList[7],24,.0001)
+                pictureToAnim(strip,0,300,picList[7],24,.0001)
             elif(Lmode == "8"):
                 modeMulti(strip)
                 

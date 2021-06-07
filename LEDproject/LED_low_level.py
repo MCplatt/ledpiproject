@@ -12,15 +12,15 @@ from PIL import Image
 def picturetoTemplate(DispStart,DispEnd, strip,Pic): #TODO add multiple displays
 
     DispTotal = DispEnd - DispStart
-    PicMid = 5 #rotate image so chevron disgne falls down frame
+    PicMid = 5 #rotate image so chevron design falls down frame
         
     im = Image.open("./LED_assets/" + Pic)
-    stdHeight = int((float(DispTotal)/im.width) * im.height) #shrink hieght as a proportion of the width
+    stdHeight = int((float(DispTotal)/im.width) * im.height) #shrink height as a proportion of the width
     im = im.resize((DispTotal,stdHeight)) #width must be the size of the display
     
     BGim = Image.open("./LED_assets/background_template.png")
 
-    BGim = BGim.resize((BGim.width,stdHeight)) #Change hieght to match amount of frames in image/animation
+    BGim = BGim.resize((strip.numPixels(),stdHeight)) #Change height to match amount of frames in image/animation
     
     
     # print(DispEnd,DispTotal,PicMid)

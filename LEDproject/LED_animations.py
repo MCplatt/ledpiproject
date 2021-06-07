@@ -30,7 +30,7 @@ def pictureToAnim(strip,dispStart,dispEnd,picture,frames,delay,mod = 0): #USE OP
     if(mod == 1):
         return pixels
 
-    stripNextPic = [0] * 150
+    stripNextPic = [0] * strip.numPixels()
     
     try:
         while True:
@@ -40,7 +40,6 @@ def pictureToAnim(strip,dispStart,dispEnd,picture,frames,delay,mod = 0): #USE OP
                 print("Frame: " + str(j))
                 for i in range(im.height):
                     x = (strip.numPixels() * j) + i
-                    
                     stripNextPic[i] = Color(pixels[x][1],pixels[x][0],pixels[x][2])
                 
                 colorChange(strip,stripNextPic, frames,delay)
