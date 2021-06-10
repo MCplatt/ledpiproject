@@ -12,7 +12,7 @@ from PIL import Image
 def picturetoTemplate(DispStart,DispEnd, strip,Pic): #TODO add multiple displays
 
     DispTotal = DispEnd - DispStart
-    PicMid = 5 #rotate image so chevron design falls down frame
+    PicMid = 0 #rotate image so chevron design falls down frame
         
     im = Image.open("./LED_assets/" + Pic)
     stdHeight = int((float(DispTotal)/im.width) * im.height) #shrink height as a proportion of the width
@@ -30,21 +30,22 @@ def picturetoTemplate(DispStart,DispEnd, strip,Pic): #TODO add multiple displays
     
     for j in range(stdHeight-1,-1,-1): #loop through image from bottom to top, 
         print("---------Frame: " + str(j))
-        for i in range(DispTotal):
-            if (i <= PicMid): #move image pixel and put pixel in the background image
+        for i in range(strip.numPixels()):
+            #print(i)
+            if (i >= DispStart and i < PicMid): #move image pixel and put pixel in the background image
                 #DEBUG BLOCK===============
-                print(DispStart + (i + (DispTotal - PicMid)),j,im.getpixel((i,j)))
-                print("UNDER MID")
+                #print(DispStart + (i + (DispTotal - PicMid)),j,im.getpixel((i,j)))
+                #print("UNDER MID")
                 #DEBUG BLOCK===============
                 BGim.putpixel( ((DispStart + (i + (DispTotal - PicMid))), j), im.getpixel((i,j)) ) 
                
-            else:    
+            elif(i>=PicMid and i < DispEnd):    
+                
+                #DEBUG BLOCK===============
+                #print((DispStart + (i + PicMid)),j,im.getpixel((i,j)))
+                #print("OVER MID")
+                #DEBUG BLOCK===============
                 BGim.putpixel( ((DispStart + (i - PicMid)), j), im.getpixel((i,j)) ) 
-                #DEBUG BLOCK===============
-                # print((DispStart + (i - PicMid)),j,im.getpixel((i,j)))
-                # print("OVER MID")
-                #DEBUG BLOCK===============
-    
     return BGim
 
 def hex_to_rgb(value):
