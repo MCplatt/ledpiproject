@@ -94,7 +94,7 @@ def colorChange(strip, stripNext, Frames, delay, Start = 0, mod = 0):
                 strip.setPixelColor(n,Color(Tgreen,Tred,Tblue))
         #DEBUG BLOCK===============
         # print("")
-        # print("FRAME",i)
+        print("FRAME",i)
         # print("Green","Red","Blue")
         # print(colorOneRBG)
         # print(Tgreen,Tred,Tblue)

@@ -282,7 +282,9 @@ if __name__ == '__main__':
             elif(Lmode == "1"):#ANIM FLASH
                 Ldelay = input("Delay between Frames (Sec) (.0001 fast - 2 slow):")
                 frames = input("Frames: ")
-                animFlash(strip,frames, Color(LGreen, LRed, LBlue),Ldelay,Color(LEGreen, LERed, LEBlue)) #GLOBAL COLORS
+                startIn = input("Start index: ")
+                endIn = input("End Index: ")
+                animFlash(strip,startIn,endIn,frames, Color(LGreen, LRed, LBlue),Ldelay,Color(LEGreen, LERed, LEBlue)) #GLOBAL COLORS
                 
             elif(Lmode == "4"):#MODE CAM work in progress
                 Ldelay = input("Delay between Frames (Sec) (.0001 fast - 2 slow):")
@@ -306,12 +308,10 @@ if __name__ == '__main__':
                 print(picList[int(animIndex)])
                 Ldelay = input("Delay between Frames (Sec) (.0001 fast - 2 slow):")
                 frames = input("Frames: ")
-                # Ldelay = .0001
-                # frames = 8sa
                 startIn = input("Start index: ")
                 endIn = input("End Index: ")
-                #pictureToAnim(strip,startIn,endIn,picList[int(animIndex)],frames,Ldelay)
-                pictureToAnim(strip,0,299,picList[7],24,.0001)
+                pictureToAnim(strip,startIn,endIn,picList[int(animIndex)],frames,Ldelay)
+                # DEBUG pictureToAnim(strip,0,299,picList[7],24,.0001)
             elif(Lmode == "8"):
                 modeMulti(strip)
                 

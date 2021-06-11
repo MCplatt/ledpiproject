@@ -37,9 +37,9 @@ def pictureToAnim(strip,dispStart,dispEnd,picture,frames,delay,mod = 0): #USE OP
         while True:
             #print("Height: " + str(im.height) + "Width: " + str(im.width))
             #print(im.size)
-            for j in range(im.width):
+            for j in range(im.height):
                 print("Frame: " + str(j))
-                for i in range(im.height):
+                for i in range(im.width):
                     x = (strip.numPixels() * j) + i
                     #print(x)
                     stripNextPic[i] =  Color(pixels[x][1],pixels[x][0],pixels[x][2])
@@ -109,11 +109,11 @@ def animPulse(strip,frames, colorOne, delay, colorTwo):
         
 #Loop through every LED set to Color1, update display
 #Loop through every LED set to Color2, update display 
-def animFlash(strip, frames, colorOne, delay, colorTwo):
-    stripNextFlash = [0] * 150
+def animFlash(strip, dispStart, dispEnd, frames, colorOne, delay, colorTwo):
+    stripNextFlash = [0] * strip.numPixels()
 
     for j in range(strip.numPixels()):   #initialise the strip once because its an ANIMATION
-        if(j<82):
+        if(j<dispStart or j>dispEnd):
             strip.setPixelColor(j,Color(0,0,0))
         else:    
             strip.setPixelColor(j,colorTwo)
@@ -121,14 +121,14 @@ def animFlash(strip, frames, colorOne, delay, colorTwo):
     try:
         while True:
             for i in range(strip.numPixels()):
-                if(i<82):
+                if(j<dispStart and j>dispEnd):
                     stripNextFlash[i] = Color(0,0,0)
                 else:  
                     stripNextFlash[i] = colorOne
             colorChange(strip,stripNextFlash, frames,delay)
 
             for i in range(strip.numPixels()):
-                if(i<82):
+                if(j<dispStart and j>dispEnd):
                     stripNextFlash[i] = Color(0,0,0)
                 else:  
                     stripNextFlash[i] = colorTwo
