@@ -237,13 +237,13 @@ if __name__ == '__main__':
         
     elif(method == "auto"):
         print("Color Main/Day")
-        LGreen = 255
-        LRed = 40
-        LBlue = 25
+        LGreen = 0
+        LRed = 0
+        LBlue = 255
         print("Color Secondary/Night")
-        LEGreen = 75
+        LEGreen = 0
         LERed = 255
-        LEBlue = 20
+        LEBlue = 0
     # MULTIFRAME VARIABLES make setable at some point, constant for now
     timeBounds = (50,100)
     weatherBounds = (100,150)
@@ -280,10 +280,10 @@ if __name__ == '__main__':
                 modeWeather(strip,81,148)
                 
             elif(Lmode == "1"):#ANIM FLASH
-                Ldelay = input("Delay between Frames (Sec) (.0001 fast - 2 slow):")
-                frames = input("Frames: ")
-                startIn = input("Start index: ")
-                endIn = input("End Index: ")
+                Ldelay = .0001 #input("Delay between Frames (Sec) (.0001 fast - 2 slow):")
+                frames = 60 #input("Frames: ")
+                startIn = 50 #input("Start index: ")
+                endIn = 250 #input("End Index: ")
                 animFlash(strip,startIn,endIn,frames, Color(LGreen, LRed, LBlue),Ldelay,Color(LEGreen, LERed, LEBlue)) #GLOBAL COLORS
                 
             elif(Lmode == "4"):#MODE CAM work in progress

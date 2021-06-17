@@ -121,14 +121,16 @@ def animFlash(strip, dispStart, dispEnd, frames, colorOne, delay, colorTwo):
     try:
         while True:
             for i in range(strip.numPixels()):
-                if(j<dispStart and j>dispEnd):
+                if(i<dispStart or i>dispEnd):
                     stripNextFlash[i] = Color(0,0,0)
                 else:  
                     stripNextFlash[i] = colorOne
+            #print(strip)
+            #print(stripNextFlash)
             colorChange(strip,stripNextFlash, frames,delay)
 
             for i in range(strip.numPixels()):
-                if(j<dispStart and j>dispEnd):
+                if(i<dispStart or i>dispEnd):
                     stripNextFlash[i] = Color(0,0,0)
                 else:  
                     stripNextFlash[i] = colorTwo
