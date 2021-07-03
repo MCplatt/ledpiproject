@@ -128,6 +128,7 @@ def animFlash(strip, dispStart, dispEnd, frames, colorOne, delay, colorTwo):
             #print(strip)
             #print(stripNextFlash)
             colorChange(strip,stripNextFlash, frames,delay)
+            throwaway = raw_input("")
 
             for i in range(strip.numPixels()):
                 if(i<dispStart or i>dispEnd):
@@ -135,7 +136,8 @@ def animFlash(strip, dispStart, dispEnd, frames, colorOne, delay, colorTwo):
                 else:  
                     stripNextFlash[i] = colorTwo
             colorChange(strip,stripNextFlash, frames,delay)
-            
+            throwaway = raw_input("")
+
     except KeyboardInterrupt:
         print("exit flash")
         animExit(1,strip)  

@@ -64,7 +64,8 @@ def colorChangeFun(LEDColorOne,LEDColorTwo,Frame,CurrFrame):
     if Frame <= 1:
         return LEDColorTwo
     else:
-        #print(int(  LightMedian + ((LightDif/2)  * (float(HalfFrame - CurrFrame)/HalfFrame))  ))
+        #print("Color change(median, light def/2, frame pos):")
+        #print( int(LightMedian), int(LightDif/2),  float((HalfFrame - CurrFrame)/HalfFrame))
         return abs(int(  LightMedian + ((LightDif/2)  * (float(HalfFrame - CurrFrame)/HalfFrame))  ))
 
 def colorChange(strip, stripNext, Frames, delay, Start = 0, mod = 0):
@@ -87,20 +88,22 @@ def colorChange(strip, stripNext, Frames, delay, Start = 0, mod = 0):
             Tgreen = colorChangeFun(colorOneRBG[0],colorTwoRBG[0], Frames, i)
             Tred = colorChangeFun(colorOneRBG[1],colorTwoRBG[1], Frames, i)
             Tblue = colorChangeFun(colorOneRBG[2],colorTwoRBG[2], Frames, i)
-        
+            #time.sleep(1)
+            #DEBUG BLOCK===============
+            if(n == 150):
+                print("")
+                print("FRAME",i)
+                print("Green","Red","Blue")
+                print(colorOneRBG)
+                print(Tgreen,Tred,Tblue)
+                print(colorTwoRBG)
+                print("")     
+            #DEBUG BLOCK===============
             if (mod == 1):
                 stripTemp[n] = Color(Tgreen,Tred,Tblue)
             else:
                 strip.setPixelColor(n,Color(Tgreen,Tred,Tblue))
-        #DEBUG BLOCK===============
-        # print("")
-        # print("FRAME",i)
-        # print("Green","Red","Blue")
-        # print(colorOneRBG)
-        # print(Tgreen,Tred,Tblue)
-        # print(colorTwoRBG)
-        # print("")     
-        #DEBUG BLOCK===============
+
         if (mod == 1):
             return stripTemp
         else:
