@@ -59,33 +59,39 @@ def modeCam(strip,frames, colorOne, delay,colorTwo):
             cam.awb_gains = gain_set
             # prepping for analysis and recording background noisez
             # the objects should be removed while background noise is calibrated
-            data = numpy.empty((cam_res[0] , cam_res[1],3),dtype=numpy.uint8)
-            noise = numpy.empty((cam_res[0] , cam_res[1],3),dtype=numpy.uint8)
-            x,y = numpy.meshgrid(numpy.arange(numpy.shape(data)[1]),numpy.arange(0,numpy.shape(data)[0]))
+            data = numpy.empty((cam_res[0]* cam_res[1]*3),dtype=numpy.uint8)
+            noise = numpy.empty((cam_res[0]* cam_res[1]*3),dtype=numpy.uint8)
+
+            ## x,y = numpy.meshgrid(numpy.arange(numpy.shape(data)[1]),numpy.arange(0,numpy.shape(data)[0]))
             rgb_text = ['Red','Green','Blue'] # array for naming color
             # input("press enter to capture background noise (remove colors)")
-            cam.capture(noise,format ='rgb')
-            noise = noise-numpy.mean(noise) # background 'noise'
+            cam.capture(noise,'rgb')
+            
+            print("noise",1- (numpy.mean(noise)/255),noise)
+            noise = noise * (1-(numpy.mean(noise)/255)) # background 'noise'
+            print("noise",noise)
             # looping with different images to determine instantaneous colors
             while True:
                 try:
                     print('===========================')
                     raw_input("press enter to capture image")
                     cam.capture(data,'rgb')
+                   # print("data",data)
                     time.sleep(.1)
                     cam.capture('testPic.jpg')
-                    print("data" , data[1])
+                   # print("data" , data[1])
                     
                     mean_array,std_array = [],[]
-                    for i in range(0,3):
-            
+                    for i in range(3):
+                        print(i)
                         # calculate mean and STDev and print out for each color
-                        print(data, numpy.mean(data) ,numpy.mean(noise[i]))
-                        print('point', data[:,:,i] ,noise[:,:,i])
+                        print(data, numpy.mean(data) ,numpy.mean(noise))
+                        print('points', data[i::3] ,noise[i::3])
                         time.sleep(1)
-                        mean_array.append(numpy.mean(data[:,i]-numpy.mean(data)-numpy.mean(noise[:,i])))
-                        std_array.append(numpy.std(data[:,i]-numpy.mean(data)-numpy.mean(noise[:,i])))
-                        print(rgb_text[i]+'---mean: {0:2.1f}, stdev: {1:2.1f}'.format(mean_array[i],std_array[i]))
+                        print(data[i::3],"-",numpy.mean(data) , "-", numpy.mean(noise[i::3]))
+                        mean_array.append(numpy.mean(data[i::3]-numpy.mean(noise[i::3])))
+                        std_array.append(numpy.std(data[i::3]-numpy.mean(data)-numpy.std(noise[i::3])))
+                        print(rgb_text[i]+'---mean: {0}, stdev: {1}'.format(mean_array,std_array))
                         print('-------------------------')
                     # guess the color of the object
                     print('--------------------------')
@@ -93,11 +99,11 @@ def modeCam(strip,frames, colorOne, delay,colorTwo):
                     print('--------------------------')
                 except KeyboardInterrupt:
                     break
-            
+                    print("exit Cam")
+            break
             
     except KeyboardInterrupt:
-        print("exit weather")
-        animExit(0,strip) 
+        print("exit Cam")
           
             
         
