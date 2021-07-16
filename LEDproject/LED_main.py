@@ -36,63 +36,84 @@ LBlue = 0
 LGreen = 0
 
 
-def modeCam(strip,frames, colorOne, delay,colorTwo):
+def modeCam(strip,height,dispStart,dispEnd,frames, colorOne, delay,colorTwo):
 
     try:
         while True:
-            
+            ##Cam Init---------------------------------------------------------------------------
             h = 640 # change this to anything < 2592 (anything over 2000 will likely get a memory error when plotting
-            cam_res = (int(h),int(0.75*h)) # keeping the natural 3/4 resolution of the camera
-            cam_res = (int(16*numpy.floor(cam_res[1]/16)),int(32*numpy.floor(cam_res[0]/32)))
-            print("cam_res", cam_res)
-            cam = PiCamera()
-            ## making sure the picamera doesn't change white balance or exposure
-            ## this will help create consistent images
+            cam_res = (int(0.75*h),int(h)) # keeping the natural 3/4 resolution of the camera
+            cam_res = ( int(16*numpy.floor(cam_res[0]/16)) , int(32*numpy.floor(cam_res[1]/32)) )
+            print("cam_res:", cam_res)
+
+            cam = PiCamera()## CAM INIT----
+
             cam.resolution = (cam_res[1],cam_res[0])
             cam.framerate = 30
+
             time.sleep(2) #let the camera settle
+
             cam.iso = 100
             cam.shutter_speed = cam.exposure_speed
+            print(cam.shutter_speed)
+            print(cam.exposure_speed)
+            
             cam.exposure_mode = 'off'
-            gain_set = cam.awb_gains
             cam.awb_mode = 'off'
+
+            gain_set = cam.awb_gains
             cam.awb_gains = gain_set
+
             # prepping for analysis and recording background noisez
             # the objects should be removed while background noise is calibrated
-            data = numpy.empty((cam_res[0]* cam_res[1]*3),dtype=numpy.uint8)
-            noise = numpy.empty((cam_res[0]* cam_res[1]*3),dtype=numpy.uint8)
-
-            ## x,y = numpy.meshgrid(numpy.arange(numpy.shape(data)[1]),numpy.arange(0,numpy.shape(data)[0]))
-            rgb_text = ['Red','Green','Blue'] # array for naming color
+            # data = numpy.empty((cam_res[0]* cam_res[1]*3),dtype=numpy.uint8)
+            # noise = numpy.empty((cam_res[0]* cam_res[1]*3),dtype=numpy.uint8)
             # input("press enter to capture background noise (remove colors)")
-            cam.capture(noise,'rgb')
-            
-            print("noise",1- (numpy.mean(noise)/255),noise)
-            noise = noise * (1-(numpy.mean(noise)/255)) # background 'noise'
-            print("noise",noise)
+            # cam.capture(noise,'rgb')
+            # print("noise Multi","Noise array",1- (numpy.mean(noise)/255),noise)
+            # noise = noise * (1-(numpy.mean(noise)/255)) # background 'noise'
+            # print("noise",noise)
+            # x,y = numpy.meshgrid(numpy.arange(numpy.shape(data)[1]),numpy.arange(0,numpy.shape(data)[0]))
+            displayWidth = dispEnd-DispStart
+            rgb_text = ['Red','Green','Blue'] # array for naming color
+            camStrip = [0] * strip.numPixels()
+            camPixel = [0] * (displayWidth)*height 
+  
             # looping with different images to determine instantaneous colors
             while True:
                 try:
                     print('===========================')
+
                     raw_input("press enter to capture image")
-                    cam.capture(data,'rgb')
-                   # print("data",data)
-                    time.sleep(.1)
+
                     cam.capture('testPic.jpg')
-                   # print("data" , data[1])
-                    
-                    mean_array,std_array = [],[]
-                    for i in range(3):
-                        print(i)
+                    cam.capture(data,'rgb')
+                    # print("data",data)
+
+                    time.sleep(.1)
+
+                    for i in range(Height):
+                            camPixel[i] = data[i:(displayWidth*3):3]))
+
+                    print(i)
+                    colorChange(strip,camStrip, frames,delay)
+
+                    ## mean_array,std_array = [],[]
+                    # for i in range(3):
+
+                       # print(i)
+                      #  cameraDisplay(strip,camStrip,frames,delay)
+
+                        # print(i)
                         # calculate mean and STDev and print out for each color
-                        print(data, numpy.mean(data) ,numpy.mean(noise))
-                        print('points', data[i::3] ,noise[i::3])
-                        time.sleep(1)
-                        print(data[i::3],"-",numpy.mean(data) , "-", numpy.mean(noise[i::3]))
-                        mean_array.append(numpy.mean(data[i::3]-numpy.mean(noise[i::3])))
-                        std_array.append(numpy.std(data[i::3]-numpy.mean(data)-numpy.std(noise[i::3])))
-                        print(rgb_text[i]+'---mean: {0}, stdev: {1}'.format(mean_array,std_array))
-                        print('-------------------------')
+                        # print(data, numpy.mean(data) ,numpy.mean(noise))
+                        # print('points', data[i::3] ,noise[i::3])
+                        # time.sleep(1)
+                        # print(data[i::3],"-",numpy.mean(data) , "-", numpy.mean(noise[i::3]))
+                        # mean_array.append(numpy.mean(data[i::3]))#-numpy.mean(noise[i::3]
+                        # std_array.append(numpy.std(data[i::3]))#-numpy.mean(data)-numpy.mean(noise[i::3]
+                        # print(rgb_text[i]+'---mean: {0}, stdev: {1}'.format(mean_array,std_array))
+                        # print('-------------------------')
                     # guess the color of the object
                     print('--------------------------')
                     print('The Object is: {}'.format(rgb_text[numpy.argmax(mean_array)]))
@@ -300,7 +321,7 @@ if __name__ == '__main__':
             elif(Lmode == "4"):#MODE CAM work in progress
                 Ldelay = input("Delay between Frames (Sec) (.0001 fast - 2 slow):")
                 frames = input("Frames: ")
-                modeCam(strip,frames, Color(LGreen, LRed, LBlue),Ldelay,Color(LEGreen, LERed, LEBlue)) #GLOBAL COLORS
+                modeCam(strip,startIn,endIn,frames, Color(LGreen, LRed, LBlue),Ldelay,Color(LEGreen, LERed, LEBlue)) #GLOBAL COLORS
                 
             elif(Lmode == "5"): #MODE TIME
                 modeTime(strip, 81,148)

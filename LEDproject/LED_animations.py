@@ -12,7 +12,15 @@ from picamera import PiCamera
 from LED_low_level import *
 import os
 
- 
+
+def cameraDisplay(strip,camStrip,frames,delay):
+    try:
+        
+    except KeyboardInterrupt:
+        print("exit Cam")
+        animExit(1,strip)
+
+
 def pictureToAnim(strip,dispStart,dispEnd,picture,frames,delay,mod = 0): #USE OPTIONAL PARAMTERS TO MAKE TIMED ANIMATION OPTIONAL
 #Mod = return Picture in list form, each elemnt is (g,r,b) form
     pictureMod = picture[:(picture.find('.'))] + "MOD" + picture[picture.find('.'):]
