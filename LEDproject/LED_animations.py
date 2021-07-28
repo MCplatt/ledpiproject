@@ -13,12 +13,12 @@ from LED_low_level import *
 import os
 
 
-def cameraDisplay(strip,camStrip,frames,delay):
-    try:
+#def cameraDisplay(strip,camStrip,frames,delay):
+    #try:
         
-    except KeyboardInterrupt:
-        print("exit Cam")
-        animExit(1,strip)
+    #except KeyboardInterrupt:
+      #  print("exit Cam")
+    #    animExit(1,strip)
 
 
 def pictureToAnim(strip,dispStart,dispEnd,picture,frames,delay,mod = 0): #USE OPTIONAL PARAMTERS TO MAKE TIMED ANIMATION OPTIONAL

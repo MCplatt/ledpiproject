@@ -90,14 +90,14 @@ def colorChange(strip, stripNext, Frames, delay, Start = 0, mod = 0):
             Tblue = colorChangeFun(colorOneRBG[2],colorTwoRBG[2], Frames, i)
             #time.sleep(1)
             #DEBUG BLOCK===============
-            if(n == 150):
-                print("")
-                print("FRAME",i)
-                print("Green","Red","Blue")
-                print(colorOneRBG)
-                print(Tgreen,Tred,Tblue)
-                print(colorTwoRBG)
-                print("")     
+            #if(n == 150):
+                #print("")
+               # print("FRAME",i)
+               # print("Green","Red","Blue")
+               # print(colorOneRBG)
+               # print(Tgreen,Tred,Tblue)
+              #  print(colorTwoRBG)
+              #  print("")     
             #DEBUG BLOCK===============
             if (mod == 1):
                 stripTemp[n] = Color(Tgreen,Tred,Tblue)

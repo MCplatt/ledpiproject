@@ -36,37 +36,33 @@ LBlue = 0
 LGreen = 0
 
 
-def modeCam(strip,height,dispStart,dispEnd,frames, colorOne, delay,colorTwo):
+def modeCam(strip,height,dispStart,dispEnd,frames, delay):
 
     try:
         while True:
             ##Cam Init---------------------------------------------------------------------------
-            h = 640 # change this to anything < 2592 (anything over 2000 will likely get a memory error when plotting
-            cam_res = (int(0.75*h),int(h)) # keeping the natural 3/4 resolution of the camera
-            cam_res = ( int(16*numpy.floor(cam_res[0]/16)) , int(32*numpy.floor(cam_res[1]/32)) )
+            #h = 640 # change this to anything < 2592 (anything over 2000 will likely get a memory error when plotting
+            cam_res = (int(640),int(480)) # keeping the natural 3/4 resolution of the camera
+            #cam_res = ( int(16*numpy.floor(cam_res[0]/16)) , int(32*numpy.floor(cam_res[1]/32)) )
             print("cam_res:", cam_res)
 
             cam = PiCamera()## CAM INIT----
-
-            cam.resolution = (cam_res[1],cam_res[0])
+            cam.resolution = (cam_res[0],cam_res[1])
             cam.framerate = 30
 
             time.sleep(2) #let the camera settle
 
             cam.iso = 100
             cam.shutter_speed = cam.exposure_speed
-            print(cam.shutter_speed)
-            print(cam.exposure_speed)
-            
             cam.exposure_mode = 'off'
             cam.awb_mode = 'off'
 
             gain_set = cam.awb_gains
             cam.awb_gains = gain_set
-
+            data = numpy.empty((cam_res[0]* cam_res[1]*3),dtype=numpy.uint8)
             # prepping for analysis and recording background noisez
             # the objects should be removed while background noise is calibrated
-            # data = numpy.empty((cam_res[0]* cam_res[1]*3),dtype=numpy.uint8)
+
             # noise = numpy.empty((cam_res[0]* cam_res[1]*3),dtype=numpy.uint8)
             # input("press enter to capture background noise (remove colors)")
             # cam.capture(noise,'rgb')
@@ -74,17 +70,25 @@ def modeCam(strip,height,dispStart,dispEnd,frames, colorOne, delay,colorTwo):
             # noise = noise * (1-(numpy.mean(noise)/255)) # background 'noise'
             # print("noise",noise)
             # x,y = numpy.meshgrid(numpy.arange(numpy.shape(data)[1]),numpy.arange(0,numpy.shape(data)[0]))
-            displayWidth = dispEnd-DispStart
             rgb_text = ['Red','Green','Blue'] # array for naming color
-            camStrip = [0] * strip.numPixels()
-            camPixel = [0] * (displayWidth)*height 
-  
-            # looping with different images to determine instantaneous colors
+
+            displayWidth = dispEnd-dispStart
+            pixelWidth = cam_res[0]/displayWidth
+
+            camPixel = [0] * (pixelWidth*height)
+
+            dispStripNext = [0] * strip.numPixels()          
+
+            stripResHeight = 1 
+            pixelResHeight = 100
+            dispPixelMean = [0] * int((cam_res[0])/stripResHeight/pixelResHeight)
+            dispRGB = [0] *3
+                         # looping with different images to determine instantaneous colors
             while True:
                 try:
                     print('===========================')
 
-                    raw_input("press enter to capture image")
+                   # raw_input("press enter to capture image")
 
                     cam.capture('testPic.jpg')
                     cam.capture(data,'rgb')
@@ -92,11 +96,32 @@ def modeCam(strip,height,dispStart,dispEnd,frames, colorOne, delay,colorTwo):
 
                     time.sleep(.1)
 
-                    for i in range(Height):
-                            camPixel[i] = data[i:(displayWidth*3):3]))
-
-                    print(i)
-                    colorChange(strip,camStrip, frames,delay)
+                    itr  = 0
+                    for s in range(0,cam_res[0]*3,pixelWidth*3):
+                        for i in range(3):
+                            itrTwo = 0
+                            for h in range(0, (cam_res[1]/stripResHeight)*3,pixelResHeight*3):
+                                #print(data.size)
+                                #print("===" , s, i,h)
+                                #print(s+i+(cam_res[0]*h),(s+i+(cam_res[0]*h) + pixelWidth*3))
+                                #print(h)
+                                pixStart = (s+i+(cam_res[0]*h))
+                                pixEnd = (s+i+(cam_res[0]*h) + pixelWidth)
+                                dispPixelMean[itrTwo] = numpy.mean(data[ pixStart : pixEnd : 3])
+                                #print("dispPixelMean", dispPixelMean[itrTwo])
+                                itrTwo = itrTwo + 1
+                            
+                            dispRGB[i] = numpy.mean(dispPixelMean)
+                        #print("-------------------------------------------------------")
+                        #print(dispRGB[0],dispRGB[1],dispRGB[2])
+                        #print(itr + dispStart)
+                        if(itr + dispStart) < len(dispStripNext):
+                           dispStripNext[itr + dispStart] = Color(int(dispRGB[1]),int(dispRGB[0]),int(dispRGB[2]))
+                        itr = itr + 1
+                        
+                    print("i", i)
+                    print(dispStripNext)
+                    colorChange(strip,dispStripNext, frames,delay)
 
                     ## mean_array,std_array = [],[]
                     # for i in range(3):
@@ -116,16 +141,17 @@ def modeCam(strip,height,dispStart,dispEnd,frames, colorOne, delay,colorTwo):
                         # print('-------------------------')
                     # guess the color of the object
                     print('--------------------------')
-                    print('The Object is: {}'.format(rgb_text[numpy.argmax(mean_array)]))
+
                     print('--------------------------')
                 except KeyboardInterrupt:
                     break
                     print("exit Cam")
+            cam.close()
             break
             
     except KeyboardInterrupt:
         print("exit Cam")
-          
+        animExit(1,strip)            
             
         
 def modeWeather(strip,dispStart,dispEnd,mod=0):
@@ -319,9 +345,11 @@ if __name__ == '__main__':
                 animFlash(strip,startIn,endIn,frames, Color(LGreen, LRed, LBlue),Ldelay,Color(LEGreen, LERed, LEBlue)) #GLOBAL COLORS
                 
             elif(Lmode == "4"):#MODE CAM work in progress
-                Ldelay = input("Delay between Frames (Sec) (.0001 fast - 2 slow):")
-                frames = input("Frames: ")
-                modeCam(strip,startIn,endIn,frames, Color(LGreen, LRed, LBlue),Ldelay,Color(LEGreen, LERed, LEBlue)) #GLOBAL COLORS
+                Ldelay = .001 #input("Delay between Frames (Sec) (.0001 fast - 2 slow):")
+                frames = 10 #input("Frames: ")
+                startIn = 0 #input("Start index: ")
+                endIn = 299 #input("End Index: ")
+                modeCam(strip,1,startIn,endIn,frames,Ldelay) 
                 
             elif(Lmode == "5"): #MODE TIME
                 modeTime(strip, 81,148)
