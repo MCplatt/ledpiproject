@@ -36,7 +36,7 @@ LBlue = 0
 LGreen = 0
 
 
-def modeCam(strip,height,dispStart,dispEnd,frames, delay):
+def modeCam(strip,heightDisp,widthDisp,dispStart,dispEnd,frames, delay):
 
     try:
         while True:
@@ -45,11 +45,15 @@ def modeCam(strip,height,dispStart,dispEnd,frames, delay):
             cam_res = (int(640),int(480)) # keeping the natural 3/4 resolution of the camera
             #cam_res = ( int(16*numpy.floor(cam_res[0]/16)) , int(32*numpy.floor(cam_res[1]/32)) )
             print("cam_res:", cam_res)
+            print("disp", widthDisp,heightDisp)
+
+
 
             cam = PiCamera()## CAM INIT----
             cam.resolution = (cam_res[0],cam_res[1])
             cam.framerate = 30
-
+            
+            
             time.sleep(2) #let the camera settle
 
             cam.iso = 100
@@ -70,20 +74,25 @@ def modeCam(strip,height,dispStart,dispEnd,frames, delay):
             # noise = noise * (1-(numpy.mean(noise)/255)) # background 'noise'
             # print("noise",noise)
             # x,y = numpy.meshgrid(numpy.arange(numpy.shape(data)[1]),numpy.arange(0,numpy.shape(data)[0]))
-            rgb_text = ['Red','Green','Blue'] # array for naming color
+            # rgb_text = ['Red','Green','Blue'] # array for naming color
 
-            displayWidth = dispEnd-dispStart
-            pixelWidth = cam_res[0]/displayWidth
+            # displayWidth = dispEnd-dispStart
+            
+            pixelSize = ((cam_res[0]*cam_res[1])/widthDisp/heightDisp)*3
+            camPixel = [0] * pixelSize
 
-            camPixel = [0] * (pixelWidth*height)
+            pixelHeight = cam_res[0] / dispHeight
+            pixelWidth = cam_res[1] / dispWidth
+            # dataWidthAdjust = [0] * heightDispAdjust * widthDispAdjust * 3
+            # dataBothAdjust = [0] 
+                    
 
-            dispStripNext = [0] * strip.numPixels()          
-
-            stripResHeight = 1 
-            pixelResHeight = 100
-            dispPixelMean = [0] * int((cam_res[0])/stripResHeight/pixelResHeight)
+            # stripResHeight = 1 
+            # pixelResHeight = 100
+            dispPixelMean = [0] * pixelSize
             dispRGB = [0] *3
-                         # looping with different images to determine instantaneous colors
+                         # looping with different successive images to determine instantaneous colors
+            dispStripNext = [0] * strip.numPixels()  
             while True:
                 try:
                     print('===========================')
@@ -93,16 +102,47 @@ def modeCam(strip,height,dispStart,dispEnd,frames, delay):
                     cam.capture('testPic.jpg')
                     cam.capture(data,'rgb')
                     # print("data",data)
-
+                    
                     time.sleep(.1)
+                    
+                    # raw_input("press enter to capture image")
+                    """
+                    step = widthDispAdjust / widthDisp 
+                    print("Step", step)
+                    
+                    for itr in range(0,widthDispAdjust * heightDispAdjust*3, (step+2)):
+                        for j in range(3):
+                            dataWidthAdjust[h] = numpy.mean(data[ itr+j : itr+j+step : 3])
+                            h+=1
 
+                            print("itr", itr,"----", dataWidthAdjust[h], numpy.mean(data[ itr+j : itr+j+step : 3]))
+
+                    h = 0
+                    step = ((heightDispAdjust / heightDisp)*widthDisp) 
+                    for itr in range(0,widthDisp * heightDispAdjust*3):
+                        dispStripNext[h] = Color(numpy.mean(data[ itr+1 : itr+1+step : widthDisp]), numpy.mean(data[ itr : itr+step : widthDisp]), numpy.mean(data[ itr+2 : itr+2+step : widthDisp]))
+                        h+=1
+
+
+
+                        print("itr", itr,"----", dispStripNext[h], numpy.mean(data[ itr+1 : itr+1+step : widthDisp]), numpy.mean(data[ itr : itr+step : widthDisp]), numpy.mean(data[ itr+2 : itr+2+step : widthDisp]))
+                        
+                        if itr%widthDisp:
+                            itr += step - widthDisp
+
+                    # print(dispStripNext)
+                    colorChange(strip,dispStripNext, frames,delay)
+
+
+                    """
                     itr  = 0
-                    for s in range(0,cam_res[0]*3,pixelWidth*3):
+                    h = 0
+                    for s in range(0,cam_res[0]*cam_res[1]*3,pixelWidth*3):
                         for i in range(3):
                             itrTwo = 0
-                            for h in range(0, (cam_res[1]/stripResHeight)*3,pixelResHeight*3):
+                            for h in range(0, pixelHeight):
                                 #print(data.size)
-                                #print("===" , s, i,h)
+                                print("===" , s, i,h)
                                 #print(s+i+(cam_res[0]*h),(s+i+(cam_res[0]*h) + pixelWidth*3))
                                 #print(h)
                                 pixStart = (s+i+(cam_res[0]*h))
@@ -115,14 +155,10 @@ def modeCam(strip,height,dispStart,dispEnd,frames, delay):
                         #print("-------------------------------------------------------")
                         #print(dispRGB[0],dispRGB[1],dispRGB[2])
                         #print(itr + dispStart)
-                        if(itr + dispStart) < len(dispStripNext):
+                        if(itr + dispStart) < dispEnd:
                            dispStripNext[itr + dispStart] = Color(int(dispRGB[1]),int(dispRGB[0]),int(dispRGB[2]))
                         itr = itr + 1
-                        
-                    print("i", i)
-                    print(dispStripNext)
                     colorChange(strip,dispStripNext, frames,delay)
-
                     ## mean_array,std_array = [],[]
                     # for i in range(3):
 
@@ -140,8 +176,6 @@ def modeCam(strip,height,dispStart,dispEnd,frames, delay):
                         # print(rgb_text[i]+'---mean: {0}, stdev: {1}'.format(mean_array,std_array))
                         # print('-------------------------')
                     # guess the color of the object
-                    print('--------------------------')
-
                     print('--------------------------')
                 except KeyboardInterrupt:
                     break
@@ -349,7 +383,9 @@ if __name__ == '__main__':
                 frames = 10 #input("Frames: ")
                 startIn = 0 #input("Start index: ")
                 endIn = 299 #input("End Index: ")
-                modeCam(strip,1,startIn,endIn,frames,Ldelay) 
+                dispHeight = 20 #input("Display Height: ")
+                dispWidth = 15 #input("Display Width: ")
+                modeCam(strip,dispHeight,dispWidth,startIn,endIn,frames,Ldelay) 
                 
             elif(Lmode == "5"): #MODE TIME
                 modeTime(strip, 81,148)
@@ -384,3 +420,4 @@ if __name__ == '__main__':
         animExit(0,strip)   
         os._exit(0)
         
+4
